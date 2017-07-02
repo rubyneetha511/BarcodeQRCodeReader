@@ -1,1 +1,2 @@
 # BarcodeQRCodeReader
+Edited
