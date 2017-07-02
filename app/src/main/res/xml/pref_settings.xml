@@ -1,0 +1,25 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+
+    <!-- NOTE: SwitchPreference's summary should be set to its value by the activity code. -->
+    <SwitchPreference
+        android:key="settings_beep"
+        android:title="@string/pref_settings_beep"
+        android:defaultValue="true" />
+
+    <SwitchPreference
+        android:key="settings_vibrate"
+        android:title="@string/pref_settings_vibrate"
+        android:defaultValue="false" />
+
+    <SwitchPreference
+        android:key="settings_add_to_history"
+        android:title="@string/pref_settings_add_to_history"
+        android:defaultValue="true" />
+
+    <SwitchPreference
+        android:key="settings_allow_camera_access"
+        android:title="@string/pref_settings_allow_camera_access"
+        android:defaultValue="true" />
+
+</PreferenceScreen>
