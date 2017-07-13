@@ -22,13 +22,18 @@
             android:name=".barcode.BarcodeCaptureActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar" />
         <activity
-            android:name=".settings.OptionsActivity"
-            android:label="@string/title_activity_settings">
-        </activity>
+            android:name=".menu.SettingsActivity"
+            android:label="@string/title_activity_settings" />
         <activity
-            android:name=".options.OptionsActivity"
-            android:label="@string/title_activity_options"
+            android:name=".settings.NavigationActivity"
+            android:label="@string/title_activity_navigation"
             android:theme="@style/AppTheme.NoActionBar">
+
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
         </activity>
     </application>
 
