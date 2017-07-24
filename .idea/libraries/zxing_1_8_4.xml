@@ -1,0 +1,10 @@
+<component name="libraryTable">
+  <library name="zxing-1.8.4">
+    <CLASSES>
+      <root url="jar://$PROJECT_DIR$/../../../Dev Aids/Software Tools/gradle-3.5/caches/transforms-1/files-1.1/zxing-1.8.4.aar/1b0ce29a7762393527a4edd8e492f330/jars/classes.jar!/" />
+      <root url="file://$PROJECT_DIR$/../../../Dev Aids/Software Tools/gradle-3.5/caches/transforms-1/files-1.1/zxing-1.8.4.aar/1b0ce29a7762393527a4edd8e492f330/res" />
+    </CLASSES>
+    <JAVADOC />
+    <SOURCES />
+  </library>
+</component>
