@@ -50,7 +50,9 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -63,7 +65,7 @@ import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.project.scanner.R;
 import com.project.scanner.camera.CameraSource;
 import com.project.scanner.camera.CameraSourcePreview;
-import com.project.scanner.settings.NavigationActivity;
+import com.project.scanner.settings.SettingsActivity;
 
 import java.io.IOException;
 
@@ -360,17 +362,24 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
+        if (id == R.id.nav_scan) {
 
-        } else if (id == R.id.nav_slideshow) {
+        } else if (id == R.id.nav_history) {
 
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.nav_settings) {
 
-//        } else if (id == R.id.nav_share) {
+            item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+                    startActivityForResult(intent, 1);
+                    return true;
+                }
+            });
 
-//        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.nav_about) {
+
+        } else if (id == R.id.nav_exit) {
 
         }
 
