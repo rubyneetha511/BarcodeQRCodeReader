@@ -11,6 +11,7 @@ import android.util.Log;
 
 import com.google.zxing.Result;
 import com.project.scanner.R;
+import com.project.scanner.data.DBHelper;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
@@ -21,14 +22,14 @@ import me.dm7.barcodescanner.zxing.ZXingScannerView;
 public class ScanActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
     private ZXingScannerView mScannerView;
 
-    dbHelper1 dbhelper;
+    DBHelper dbhelper;
     SQLiteDatabase db;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        dbhelper= new dbHelper1(getApplicationContext());
+        dbhelper= new DBHelper(getApplicationContext());
         db=dbhelper.getWritableDatabase();
 
         setContentView(R.layout.activity_main);

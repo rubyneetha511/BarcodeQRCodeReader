@@ -7,8 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-
 import com.project.scanner.R;
+import com.project.scanner.data.HistoryData;
 
 import java.util.List;
 
@@ -17,10 +17,10 @@ import java.util.List;
  */
 
 public class RVAdapter1 extends RecyclerView.Adapter<RVAdapter1.PersonViewHolder>{
-    List<History_Data> history_data;
+    public List<HistoryData> history_data;
 
 
-    RVAdapter1(List<History_Data> history_data){
+    public RVAdapter1(List<HistoryData> history_data){
         this.history_data = history_data;
     }
 
@@ -42,8 +42,8 @@ public class RVAdapter1 extends RecyclerView.Adapter<RVAdapter1.PersonViewHolder
 //        personViewHolder.pick_up_time.setText(friends_data.get(i).getPickUpTime());
 //        personViewHolder.pick_up_by.setText(friends_data.get(i).getPickUpBy());
 //        personViewHolder.order_item_count.setText(String.valueOf(friends_data.get(i).getOrderItemCount()));
-         personViewHolder.scnantext.setText(history_data.get(i).getScantext());
-         personViewHolder.scanformat.setText(history_data.get(i).getScanformat());
+         personViewHolder.dataType.setText(history_data.get(i).getDataType());
+         personViewHolder.dataValue.setText(history_data.get(i).getDataValue());
 
 
     }
@@ -55,15 +55,15 @@ public class RVAdapter1 extends RecyclerView.Adapter<RVAdapter1.PersonViewHolder
 
     public static class PersonViewHolder extends RecyclerView.ViewHolder {
         CardView cv;
-        TextView scnantext;
-        TextView scanformat;
+        TextView dataType;
+        TextView dataValue;
 
 
         PersonViewHolder(View itemView) {
             super(itemView);
             cv = (CardView)itemView.findViewById(R.id.cv);
-            scnantext=(TextView) itemView.findViewById(R.id.scantext);
-            scanformat=(TextView)itemView.findViewById(R.id.scanformat);
+            dataType = (TextView) itemView.findViewById(R.id.dataType);
+            dataValue = (TextView)itemView.findViewById(R.id.dataValue);
 
 
 //            confrim = (Button) itemView.findViewById(R.id.confirm);

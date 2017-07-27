@@ -22,21 +22,20 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.FragmentManager;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.pm.PackageManager;
+import android.database.sqlite.SQLiteDatabase;
+import android.graphics.Point;
 import android.hardware.Camera;
+import android.media.MediaPlayer;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.NavigationView;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.Fragment;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -45,14 +44,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.Button;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -61,10 +53,12 @@ import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
-
 import com.project.scanner.R;
 import com.project.scanner.camera.CameraSource;
 import com.project.scanner.camera.CameraSourcePreview;
+import com.project.scanner.data.DBHelper;
+import com.project.scanner.data.DataActivity;
+import com.project.scanner.data.HistoryActivity;
 import com.project.scanner.settings.SettingsActivity;
 
 import java.io.IOException;
@@ -72,7 +66,7 @@ import java.io.IOException;
 public final class BarcodeCaptureActivity extends AppCompatActivity
         implements BarcodeTracker.BarcodeGraphicTrackerCallback, NavigationView.OnNavigationItemSelectedListener {
 
-    private static final String TAG = "Barcode-reader";
+    private static final String LOG_TAG = "Barcode-reader";
     private static final int REQUEST_CODE = 1;
 
     // Intent request code to handle updating play services if needed.
@@ -87,6 +81,12 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
     private CameraSource mCameraSource;
     private CameraSourcePreview mPreview;
 
+//    private SurfaceView cameraSurfaceView;
+//    private TextView mResultTextView;
+
+    DBHelper dbhelper;
+    SQLiteDatabase db;
+
     /**
      * Initializes the UI and creates the detector pipeline.
      */
@@ -96,6 +96,12 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
         setContentView(R.layout.activity_navigation);
 
         mPreview = (CameraSourcePreview) findViewById(R.id.preview);
+
+//        cameraSurfaceView = (SurfaceView) findViewById(R.id.camera_view);
+//        mResultTextView = (TextView) findViewById(R.id.camera_result_textview);
+
+        dbhelper = new DBHelper(getApplicationContext());
+        db = dbhelper.getWritableDatabase();
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -134,16 +140,26 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
     @Override
     public void onDetectedQrCode(Barcode barcode) {
         if (barcode != null) {
-            Intent intent = new Intent();
+            Intent intent = new Intent(getApplicationContext(), DataActivity.class);
+            //startActivityForResult(intent, BARCODE_READER_REQUEST_CODE);
             intent.putExtra(BarcodeObject, barcode);
+            //intent.putExtra("CameraSourcePreview", mPreview);
             setResult(CommonStatusCodes.SUCCESS, intent);
+
+//            Point[] p = barcode.cornerPoints;
+//            mResultTextView.setText(barcode.displayValue);
+
+            dbhelper.addHistory(db, barcode.displayValue, String.valueOf(barcode.format));
+
+            startActivity(intent);
+
             finish();
         }
     }
 
     // Handles the requesting of the camera permission.
     private void requestCameraPermission() {
-        Log.w(TAG, "Camera permission is not granted. Requesting permission");
+        Log.w(LOG_TAG, "Camera permission is not granted. Requesting permission");
 
         final String[] permissions = new String[]{Manifest.permission.CAMERA};
 
@@ -183,7 +199,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
             // isOperational() can be used to check if the required native libraries are currently
             // available.  The detectors will automatically become operational once the library
             // downloads complete on device.
-            Log.w(TAG, "Detector dependencies are not yet available.");
+            Log.w(LOG_TAG, "Detector dependencies are not yet available.");
 
             // Check for low storage.  If there is low storage, the native library will not be
             // downloaded, so detection will not become operational.
@@ -193,7 +209,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
             if (hasLowStorage) {
                 Toast.makeText(this, R.string.low_storage_error,
                         Toast.LENGTH_LONG).show();
-                Log.w(TAG, getString(R.string.low_storage_error));
+                Log.w(LOG_TAG, getString(R.string.low_storage_error));
             }
         }
 
@@ -217,6 +233,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
         mCameraSource = builder
                 .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : null)
                 .build();
+
     }
 
     // Restarts the camera
@@ -268,13 +285,13 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
                                            @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
         if (requestCode != RC_HANDLE_CAMERA_PERM) {
-            Log.d(TAG, "Got unexpected permission result: " + requestCode);
+            Log.d(LOG_TAG, "Got unexpected permission result: " + requestCode);
             super.onRequestPermissionsResult(requestCode, permissions, grantResults);
             return;
         }
 
         if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            Log.d(TAG, "Camera permission granted - initialize the camera source");
+            Log.d(LOG_TAG, "Camera permission granted - initialize the camera source");
             // we have permission, so create the camerasource
             boolean autoFocus = true;
             boolean useFlash = false;
@@ -282,7 +299,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
             return;
         }
 
-        Log.e(TAG, "Permission not granted: results len = " + grantResults.length +
+        Log.e(LOG_TAG, "Permission not granted: results len = " + grantResults.length +
                 " Result code = " + (grantResults.length > 0 ? grantResults[0] : "(empty)"));
 
         DialogInterface.OnClickListener listener = new DialogInterface.OnClickListener() {
@@ -317,7 +334,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
             try {
                 mPreview.start(mCameraSource);
             } catch (IOException e) {
-                Log.e(TAG, "Unable to start camera source.", e);
+                Log.e(LOG_TAG, "Unable to start camera source.", e);
                 mCameraSource.release();
                 mCameraSource = null;
             }
@@ -337,23 +354,35 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
-        getMenuInflater().inflate(R.menu.navigation, menu);
+        getMenuInflater().inflate(R.menu.activity_navigation_drawer, menu);
+
+//        menu.findItem(R.id.nav_history).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem menuItem) {
+//                Intent intent = new Intent(getApplicationContext(), HistoryActivity.class);
+//                startActivity(intent);
+//                return true;
+//            }
+//        });
+//
+//        menu.findItem(R.id.nav_settings).setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+//            @Override
+//            public boolean onMenuItemClick(MenuItem menuItem) {
+//                Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
+//                startActivity(intent);
+//                return true;
+//            }
+//        });
+
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
-        int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
-        }
-
-        return super.onOptionsItemSelected(item);
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
+        return true;
     }
 
     @SuppressWarnings("StatementWithEmptyBody")
@@ -366,13 +395,21 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
 
         } else if (id == R.id.nav_history) {
 
+            item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+                @Override
+                public boolean onMenuItemClick(MenuItem menuItem) {
+                    Intent intent = new Intent(getApplicationContext(), HistoryActivity.class);
+                    startActivity(intent);
+                    return true;
+                }
+            });
         } else if (id == R.id.nav_settings) {
 
             item.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
                 @Override
                 public boolean onMenuItemClick(MenuItem menuItem) {
                     Intent intent = new Intent(getApplicationContext(), SettingsActivity.class);
-                    startActivityForResult(intent, 1);
+                    startActivity(intent);
                     return true;
                 }
             });
@@ -387,4 +424,137 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
         drawer.closeDrawer(GravityCompat.START);
         return true;
     }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.d("onActivityResult", "onActivityResultttt");
+
+        if (requestCode == 1) {
+            if (resultCode == CommonStatusCodes.SUCCESS) {
+                if (data != null) {
+
+                    //TODO
+                    // ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
+                    // toneG.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 200);
+
+                    Barcode barcode = data.getParcelableExtra(BarcodeCaptureActivity.BarcodeObject);
+                    Point[] p = barcode.cornerPoints;
+                    //mResultTextView.setText(barcode.displayValue);
+
+                } else {
+                 //   mResultTextView.setText(R.string.no_barcode_captured);
+                }
+            } else Log.e(LOG_TAG, String.format(getString(R.string.barcode_error_format),
+                    CommonStatusCodes.getStatusCodeString(resultCode)));
+        } else super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    public void handleResult(final Barcode barcode) {
+        // Do something with the result here
+
+        Log.e("handler", barcode.displayValue); // Prints scan results
+        //Log.e("handler", rawResult.getBarcodeFormat().toString()); // Prints the scan format (qrcode)
+        MediaPlayer mediaPlayer=MediaPlayer.create(this,R.raw.beep);
+        mediaPlayer.start();
+
+        // show the scanner result into dialog box.
+        android.support.v7.app.AlertDialog.Builder builder = new android.support.v7.app.AlertDialog.Builder(this);
+        builder.setTitle("Scan Result");
+        builder.setMessage(barcode.displayValue);
+        builder.setPositiveButton("Share ", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, barcode.displayValue);
+                //+"\n"+rawResult.getBarcodeFormat().toString());
+                sendIntent.setType("text/plain");
+                startActivity(sendIntent);
+                dialogInterface.dismiss();
+            }
+        });
+
+        builder.setNegativeButton("Save ", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                //dbhelper.addHistory(db,barcode.getText(),rawResult.getBarcodeFormat().toString());
+            }
+        });
+
+        android.support.v7.app.AlertDialog alert1 = builder.create();
+        alert1.show();
+
+        // If you would like to resume scanning, call this method below:
+        // mScannerView.resumeCameraPreview(this);
+    }
+
+    public static String formatString(Barcode barcode) {
+        String result = "";
+        if(barcode != null) {
+            switch (barcode.format) {
+                case Barcode.CODE_128:
+                    result = "CODE_128"; break;
+                case Barcode.CODE_39:
+                    result = "CODE_39"; break;
+                case Barcode.CODE_93:
+                    result = "CODE_93"; break;
+                case Barcode.CODABAR:
+                    result = "CODABAR"; break;
+                case Barcode.DATA_MATRIX:
+                    result = "DATA_MATRIX"; break;
+                case Barcode.EAN_13:
+                    result = "EAN_13"; break;
+                case Barcode.EAN_8:
+                    result = "EAN_8"; break;
+                case Barcode.ITF:
+                    result = "ITF"; break;
+                case Barcode.QR_CODE:
+                    result = "QR_CODE"; break;
+                case Barcode.UPC_A:
+                    result = "UPC_A"; break;
+                case Barcode.UPC_E:
+                    result = "UPC_E"; break;
+                case Barcode.PDF417:
+                    result = "PDF417"; break;
+                case Barcode.AZTEC:
+                    result = "AZTEC"; break;
+            }
+        }
+        return result;
+
+    }
+
+    public static String typeString(Barcode barcode) {
+        String resultType = "";
+        if(barcode != null) {
+            switch (barcode.valueFormat) {
+                case Barcode.EMAIL:
+                    resultType = "EMAIL"; break;
+                case Barcode.ISBN :
+                    resultType = "ISBN"; break;
+                case Barcode.PHONE:
+                    resultType = "PHONE"; break;
+                case Barcode.PRODUCT:
+                    resultType = "PRODUCT"; break;
+                case Barcode.SMS:
+                    resultType = "SMS"; break;
+                case Barcode.TEXT:
+                    resultType = "TEXT"; break;
+                case Barcode.URL:
+                    resultType = "URL"; break;
+                case Barcode.WIFI:
+                    resultType = "WIFI"; break;
+                case Barcode.GEO:
+                    resultType = "GEO"; break;
+                case Barcode.CALENDAR_EVENT:
+                    resultType = "CALENDAR_EVENT"; break;
+                case Barcode.DRIVER_LICENSE:
+                    resultType = "DRIVER_LICENSE"; break;
+            }
+        }
+        return resultType;
+
+    }
+
 }
