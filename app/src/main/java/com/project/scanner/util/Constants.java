@@ -1,8 +1,5 @@
 package com.project.scanner.util;
 
-/**
- * Created by vinaypra on 8/6/17.
- */
 
 public class Constants {
 

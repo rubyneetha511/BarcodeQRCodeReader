@@ -6,7 +6,7 @@
     <string name="no_barcode_captured">No barcode captured</string>
     <string name="barcode_error_format">"Error reading barcode: %1$s"</string>
 
-    <!-- Strings related to barcode com.student.com.student.scanner -->
+    <!-- Strings related to barcode com.project.scanner -->
     <string name="ok">OK</string>
     <string name="permission_camera_rationale">Access to the camera is needed for detection</string>
     <string name="no_camera_permission">This application cannot run because it does not have the camera permission.  The application will now exit.</string>
@@ -53,19 +53,20 @@
 
     <!-- Strings related to Settings -->
 
-    <!-- Example General settings -->
+    <!-- General settings -->
+    <string name="preference_file">com.project.scanner.PREFERENCE_FILE_KEY</string>
     <string name="pref_header_general">General</string>
 
-    <string name="pref_title_beep">Beep</string>
+    <string name="pref_beep">Beep</string>
     <string name="pref_description_beep">Beep when result found</string>
 
-    <string name="pref_title_vibrate">Vibrate</string>
+    <string name="pref_vibrate">Vibrate</string>
     <string name="pref_description_vibrate">Vibrate when result found</string>
 
-    <string name="pref_title_add_to_history">Add to history</string>
+    <string name="pref_add_to_history">Add to history</string>
     <string name="pref_description_add_to_history">Add result to history</string>
 
-    <string name="pref_title_allow_camera_access">Allow camera access</string>
+    <string name="pref_allow_camera_access">Allow camera access</string>
     <string name="pref_description_allow_camera_access">Allow camera access. No scanning allowed if camera access disabled.</string>
 
     <!-- Example settings for Data & Sync -->
@@ -113,6 +114,9 @@
     <string name="title_activity_basic">BasicActivity</string>
 
     <string name="title_activity_fullscreen">FullscreenActivity</string>
-    <string name="dummy_button">Dummy Button</string>
-    <string name="dummy_content">DUMMY\nCONTENT</string>
+
+
+    <string name="button_open">Open</string>
+    <string name="button_share">Share</string>
+
 </resources>

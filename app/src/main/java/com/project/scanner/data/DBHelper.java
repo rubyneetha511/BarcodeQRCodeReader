@@ -8,31 +8,24 @@ import android.database.sqlite.SQLiteException;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
+import com.project.scanner.util.Constants;
+
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
-/**
- * Created by siva on 7/10/17.
- */
-
 public class DBHelper extends SQLiteOpenHelper {
-    String DB_PATH = null;
+    private String DB_PATH = null;
+    public static final int DATABASE_VERSION = 1;
 
     private final Context myContext;
-
-    private static final String TABLE_NAME = "qrcodes";
-    private static final String DB_NAME = "spaces.db";
-
-    // Data
-    private static final String DATA_VALUE = "value";
-    private static final String DATA_FORMAT = "format";
-    private static final String DATA_TIMESTAMP = "timestamp";
-
+    private SQLiteDatabase db;
 
     public DBHelper(Context ctx) {
-        super(ctx, DB_NAME, null, 1);
+        super(ctx, Constants.DB_NAME, null, DATABASE_VERSION);
         this.myContext = ctx;
-        DB_PATH = "/data/data/" + myContext.getPackageName() + "/databases/" + DB_NAME;
+        DB_PATH = "/data/data/" + myContext.getPackageName() + "/databases/" + Constants.DB_NAME;
     }
 
     @Override
@@ -41,16 +34,29 @@ public class DBHelper extends SQLiteOpenHelper {
         boolean dbExist = checkDataBase();
 
         if (dbExist) {
+//            db.execSQL("drop table if exists " + Constants.TABLE_NAME);
+//
+//            db.execSQL("create table " + Constants.TABLE_NAME + " ("
+//                    + Constants.DATA_VALUE + " text not null, "
+//                    + Constants.DATA_FORMAT + " number not null, "
+//                    + Constants.DATA_TYPE + " text not null, "
+//                    + Constants.DATA_DATE + " text not null, "
+//                    + "PRIMARY KEY (" + Constants.DATA_VALUE + ", "
+//                    + Constants.DATA_FORMAT + ", " + Constants.DATA_TYPE + "))");
+
             Log.d("SQLiteDatabase", "DB Exists");
 
         } else {
-            db.execSQL("create table " + TABLE_NAME + " ("+ DATA_VALUE + " text not null, "
-                    + DATA_FORMAT + " text not null)");
+            db.execSQL("create table " + Constants.TABLE_NAME + " ("
+                    + Constants.DATA_VALUE + " text not null, "
+                    + Constants.DATA_FORMAT + " number not null, "
+                    + Constants.DATA_TYPE + " text not null, "
+                    + Constants.DATA_DATE + " text not null, "
+                    + "PRIMARY KEY (" + Constants.DATA_VALUE + ", "
+                    + Constants.DATA_FORMAT + ", " + Constants.DATA_TYPE + "))");
 
             Log.d("SQLiteDatabase", "DB created successfully");
         }
-        //do some insertions or whatever you need
-
 
     }
 
@@ -71,25 +77,29 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("drop table if exists" + TABLE_NAME);
+        db.execSQL("drop table if exists " + Constants.TABLE_NAME);
         onCreate(db);
     }
 
 
-    public List<HistoryData> getAllHistory(SQLiteDatabase db) {
+    public List<BarcodeData> getAllHistory() {
 
-        List<HistoryData> res = new ArrayList<HistoryData>();
         db = this.getReadableDatabase();
+        onCreate(db);
 
-        Cursor cur = db.query(TABLE_NAME, new String[]{DATA_VALUE, DATA_FORMAT
+        List<BarcodeData> res = new ArrayList<BarcodeData>();
+
+        Cursor cur = db.query(Constants.TABLE_NAME, new String[]{Constants.DATA_VALUE, Constants.DATA_FORMAT, Constants.DATA_TYPE, Constants.DATA_DATE
                 }, null, null, null, null, null);
         if (cur != null) {
             while (cur.moveToNext()) {
 
-                String dataValue = cur.getString(0);
-                String dataFormat = cur.getString(1);
+                String displayValue = cur.getString(0);
+                int format = cur.getInt(1);
+                String type = cur.getString(2);
+                String date = cur.getString(3);
 
-                HistoryData fd = new HistoryData(dataValue, dataFormat);
+                BarcodeData fd = new BarcodeData(displayValue, format, type, date);
                 res.add(fd);
 
             };
@@ -98,30 +108,39 @@ public class DBHelper extends SQLiteOpenHelper {
         return res;
     }
 
-    public Long addHistory(SQLiteDatabase db, String dataValue, String dataFormat) {
-
+    public Long addHistory(BarcodeData barcodeData) {
+        db = this.getWritableDatabase();
         onCreate(db);
 
-        ContentValues cv = new ContentValues();
-        cv.put(DATA_VALUE, dataValue);
-        cv.put(DATA_FORMAT, dataFormat);
-        Long bid = db.insert(TABLE_NAME, null, cv);
+        ContentValues initialValues = new ContentValues();
+        initialValues.put(Constants.DATA_VALUE, barcodeData.getDisplayValue());
+        initialValues.put(Constants.DATA_FORMAT, barcodeData.getFormat());
+        initialValues.put(Constants.DATA_TYPE, barcodeData.getType());
+        initialValues.put(Constants.DATA_DATE, barcodeData.getDate());
+
+        Long id = db.insertWithOnConflict(Constants.TABLE_NAME, null, initialValues, SQLiteDatabase.CONFLICT_REPLACE);
+
         db.close();
 
-        return bid;
+        return id;
     }
 
-    public Long dataExists(SQLiteDatabase db, String dataValue, String dataFormat) {
+    public int deleteHistory(String displayValue) {
 
-        ContentValues cv = new ContentValues();
-        cv.put(DATA_VALUE, dataValue);
-        cv.put(DATA_FORMAT, dataFormat);
         db = this.getWritableDatabase();
-        Long bid = db.replace(TABLE_NAME, null, cv);
+        onCreate(db);
+
+        StringBuilder whereClause = new StringBuilder();
+        whereClause.append(Constants.DATA_VALUE + "=? ");
+        //whereClause.append(Constants.DATA_FORMAT + "=? AND");
+        //whereClause.append(Constants.DATA_TYPE + "=? ");
+
+        int id = db.delete(Constants.TABLE_NAME, whereClause.toString(),
+                new String[] { displayValue});
+
         db.close();
 
-        return bid;
+        return id;
     }
-
 }
 

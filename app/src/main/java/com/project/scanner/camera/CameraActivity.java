@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
-import android.widget.TextView;
 
 import com.google.android.gms.common.api.CommonStatusCodes;
 import com.google.android.gms.vision.barcode.Barcode;
@@ -18,15 +17,12 @@ public class CameraActivity extends AppCompatActivity {
     private static final String LOG_TAG = CameraActivity.class.getSimpleName();
     private static final int BARCODE_READER_REQUEST_CODE = 1;
 
-    private TextView mResultTextView;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_scan_prompt);
 
-        mResultTextView = (TextView) findViewById(R.id.result_textview);
+        //mResultTextView = (TextView) findViewById(R.id.result_textview);
 
         Button scanBarcodeButton = (Button) findViewById(R.id.scan_barcode_button);
         scanBarcodeButton.setOnClickListener(new View.OnClickListener() {
@@ -34,7 +30,6 @@ public class CameraActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent intent = new Intent(getApplicationContext(), BarcodeCaptureActivity.class);
                 startActivity(intent);
-                //startActivityForResult(intent, BARCODE_READER_REQUEST_CODE);
             }
         });
     }
@@ -51,13 +46,16 @@ public class CameraActivity extends AppCompatActivity {
 
                     Barcode barcode = data.getParcelableExtra(BarcodeCaptureActivity.BarcodeObject);
                     Point[] p = barcode.cornerPoints;
-                    mResultTextView.setText(barcode.displayValue);
+                    //mResultTextView.setText(barcode.displayValue);
 
-                } else mResultTextView.setText(R.string.no_barcode_captured);
+                } else {
+                    //mResultTextView.setText(R.string.no_barcode_captured);
+                }
             } else Log.e(LOG_TAG, String.format(getString(R.string.barcode_error_format),
                     CommonStatusCodes.getStatusCodeString(resultCode)));
         } else super.onActivityResult(requestCode, resultCode, data);
     }
+
 
 }
 

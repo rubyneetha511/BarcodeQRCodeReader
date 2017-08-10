@@ -3,6 +3,8 @@
     package="com.project.scanner">
 
     <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.FLASHLIGHT"/>
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
     <application
         android:allowBackup="true"
@@ -10,7 +12,10 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".camera.CameraActivity">
+        <activity
+            android:name=".camera.CameraActivity"
+            android:screenOrientation="portrait"
+            >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -18,38 +23,40 @@
         </activity>
         <activity
             android:name=".barcode.BarcodeCaptureActivity"
-            android:theme="@style/Theme.AppCompat.NoActionBar" />
+            android:theme="@style/Theme.AppCompat.NoActionBar"
+            android:screenOrientation="portrait"
+            />
+
         <activity
             android:name=".settings.SettingsActivity"
-            android:parentActivityName=".camera.CameraActivity"
-            android:theme="@style/AppTheme" >
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"
+            >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".camera.CameraActivity" />
+                android:value=".barcode.BarcodeCaptureActivity" />
         </activity>
 
         <activity
             android:name=".data.DataActivity"
-            android:theme="@style/AppTheme">
-
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".barcode.BarcodeCaptureActivity" />
         </activity>
 
         <activity
             android:name=".data.HistoryActivity"
-            android:theme="@style/AppTheme">
-
+            android:theme="@style/AppTheme"
+            android:screenOrientation="portrait"
+            >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".barcode.BarcodeCaptureActivity" />
         </activity>
-
-        <activity
-            android:name=".siva.MainActivity"
-            android:label="@string/app_name"
-            android:theme="@style/AppTheme.NoActionBar">
-
-
-	    </activity>
-        <activity android:name=".siva.ScanActivity"/>
-        <activity android:name=".siva.History_Data$HistoryActivity"/>
-        <activity android:name=".siva.SettingActivity"/>
+        
     </application>
 
 </manifest>

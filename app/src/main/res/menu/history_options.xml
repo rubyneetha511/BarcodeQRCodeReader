@@ -8,10 +8,10 @@
         android:title="Delete"
         app:showAsAction="never" />
 
-    <item
-        android:id="@+id/item_share"
-        android:orderInCategory="100"
-        android:title="Share"
-        app:showAsAction="never" />
+    <!--<item-->
+        <!--android:id="@+id/item_share"-->
+        <!--android:orderInCategory="100"-->
+        <!--android:title="Share"-->
+        <!--app:showAsAction="never" />-->
 
 </menu>
