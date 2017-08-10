@@ -40,6 +40,7 @@ import com.google.android.gms.vision.MultiProcessor;
 import com.google.android.gms.vision.barcode.Barcode;
 import com.google.android.gms.vision.barcode.BarcodeDetector;
 import com.project.scanner.R;
+import com.project.scanner.camera.CameraLineView;
 import com.project.scanner.camera.CameraSource;
 import com.project.scanner.camera.CameraSourcePreview;
 import com.project.scanner.data.BarcodeData;
@@ -70,6 +71,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
     // Constants used to pass extra data in the intent
     private CameraSource mCameraSource;
     private CameraSourcePreview mPreview;
+    private CameraLineView scanningLineView;
 
     // Constants used to pass extra data in the intent
     private DBHelper dbhelper;
@@ -86,6 +88,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
         setContentView(R.layout.activity_navigation);
 
         mPreview = (CameraSourcePreview) findViewById(R.id.preview);
+        //scanningLineView = (CameraLineView) findViewById(R.id.scanningLineView);
 
         dbhelper = new DBHelper(getApplicationContext());
 
@@ -431,28 +434,28 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
         return true;
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-
-        if (requestCode == 1) {
-            if (resultCode == CommonStatusCodes.SUCCESS) {
-                if (data != null) {
-
-                    Barcode barcode = data.getParcelableExtra(BarcodeCaptureActivity.BarcodeObject);
-                    Point[] p = barcode.cornerPoints;
-                    //mResultTextView.setText(barcode.displayValue);
-
-                    Bitmap photo = (Bitmap) data.getExtras().get("data");
-                    imageView.setImageBitmap(photo);
-
-
-                } else {
-                 //   mResultTextView.setText(R.string.no_barcode_captured);
-                }
-            } else Log.e(LOG_TAG, String.format(getString(R.string.barcode_error_format),
-                    CommonStatusCodes.getStatusCodeString(resultCode)));
-        } else super.onActivityResult(requestCode, resultCode, data);
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//
+//        if (requestCode == 1) {
+//            if (resultCode == CommonStatusCodes.SUCCESS) {
+//                if (data != null) {
+//
+//                    Barcode barcode = data.getParcelableExtra(BarcodeCaptureActivity.BarcodeObject);
+//                    Point[] p = barcode.cornerPoints;
+//                    //mResultTextView.setText(barcode.displayValue);
+//
+//                    Bitmap photo = (Bitmap) data.getExtras().get("data");
+//                    imageView.setImageBitmap(photo);
+//
+//
+//                } else {
+//                 //   mResultTextView.setText(R.string.no_barcode_captured);
+//                }
+//            } else Log.e(LOG_TAG, String.format(getString(R.string.barcode_error_format),
+//                    CommonStatusCodes.getStatusCodeString(resultCode)));
+//        } else super.onActivityResult(requestCode, resultCode, data);
+//    }
 
     public void handleResult(final Barcode barcode) {
         // Do something with the result here

@@ -9,11 +9,17 @@
     tools:openDrawer="start"
     >
 
+    <com.project.scanner.camera.CameraLineView
+        android:id="@+id/scanningLineView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <com.project.scanner.camera.CameraSourcePreview
         android:id="@+id/preview"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
     </com.project.scanner.camera.CameraSourcePreview>
+
 
     <include
         layout="@layout/app_bar_navigation"

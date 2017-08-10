@@ -34,6 +34,8 @@ public class CameraSourcePreview extends ViewGroup {
 
     private Context mContext;
     public SurfaceView mSurfaceView;
+    public CameraLineView mCameraLineView;
+
     private boolean mStartRequested;
     private boolean mSurfaceAvailable;
     private CameraSource mCameraSource;
@@ -47,6 +49,11 @@ public class CameraSourcePreview extends ViewGroup {
         mSurfaceView = new SurfaceView(context);
         mSurfaceView.getHolder().addCallback(new SurfaceCallback());
         addView(mSurfaceView);
+
+        mCameraLineView = new CameraLineView(context);
+        mCameraLineView.getHolder().addCallback(new SurfaceCallback());
+        addView(mCameraLineView);
+
     }
 
     @RequiresPermission(Manifest.permission.CAMERA)
@@ -80,6 +87,8 @@ public class CameraSourcePreview extends ViewGroup {
     private void startIfReady() throws IOException, SecurityException {
         if (mStartRequested && mSurfaceAvailable) {
             mCameraSource.start(mSurfaceView.getHolder());
+            mCameraSource.start(mCameraLineView.getHolder());
+
             mStartRequested = false;
         }
     }
