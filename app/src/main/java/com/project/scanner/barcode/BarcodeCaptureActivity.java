@@ -88,45 +88,32 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
         setContentView(R.layout.activity_navigation);
 
         mPreview = (CameraSourcePreview) findViewById(R.id.preview);
-        //scanningLineView = (CameraLineView) findViewById(R.id.scanningLineView);
+        scanningLineView = (CameraLineView) findViewById(R.id.scanningLineView);
 
         dbhelper = new DBHelper(getApplicationContext());
 
-//        flashButtonView = (FloatingActionButton) findViewById(R.id.flashButton);
+        flashButtonView = (FloatingActionButton) findViewById(R.id.flashButton);
         boolean hasFlash = getApplicationContext().getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
 
-        if (!hasFlash) {
-            // device doesn't support flash
-            // Show alert message and close the application
-            AlertDialog alert = new AlertDialog.Builder(BarcodeCaptureActivity.this).create();
-            alert.setTitle("Error");
-            alert.setMessage("Sorry, your device doesn't support flash light!");
-            alert.setButton("OK", new DialogInterface.OnClickListener() {
-                public void onClick(DialogInterface dialog, int which) {
-                    // closing the application
-                    //finish();
+        final boolean autoFocus = true;
+
+        flashButtonView.setOnClickListener(new View.OnClickListener() {
+
+            @Override
+            public void onClick(View v) {
+                isFlashOn = !isFlashOn;
+                if (isFlashOn) {
+                    mCameraSource.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
+                    Toast.makeText(BarcodeCaptureActivity.this, "Flash light turned on", Toast.LENGTH_SHORT).show();
+                } else {
+                    mCameraSource.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
+                    Toast.makeText(BarcodeCaptureActivity.this, "Flash light turned off", Toast.LENGTH_SHORT).show();
                 }
-            });
-            alert.show();
-        }
+                toggleButtonImage();
+                startCameraSource();
 
-        boolean autoFocus = true;
-
-//        flashButtonView.setOnClickListener(new View.OnClickListener() {
-//
-//            @Override
-//            public void onClick(View v) {
-//                isFlashOn = !isFlashOn;//
-////                if (isFlashOn) {
-////                    mCameraSource.setFlashMode(Camera.Parameters.FLASH_MODE_ON);
-////
-////                } else {
-////                    mCameraSource.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
-////
-////                }
-//
-//            }
-//        });
+            }
+        });
 
 
         imageView = (ImageView) this.findViewById(R.id.camera_view);
@@ -156,6 +143,9 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+
+        Toast.makeText(BarcodeCaptureActivity.this, "Scan the barcode/QR code", Toast.LENGTH_LONG).show();
+
     }
 
     @Override
@@ -258,7 +248,7 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
         }
 
         mCameraSource = builder
-                .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_ON : Camera.Parameters.FLASH_MODE_OFF)
+                .setFlashMode(useFlash ? Camera.Parameters.FLASH_MODE_TORCH : Camera.Parameters.FLASH_MODE_OFF)
                 .build();
 
     }
@@ -496,54 +486,15 @@ public final class BarcodeCaptureActivity extends AppCompatActivity
         // mScannerView.resumeCameraPreview(this);
     }
 
-//    /*
-//    * Turning On flash
-//    */
-//    private void turnOnFlash() {
-//        if (!isFlashOn) {
-//            params = camera.getParameters();
-//            params.setFlashMode(Parameters.FLASH_MODE_TORCH);
-//            camera.setParameters(params);
-//            camera.startPreview();
-//            isFlashOn = true;
-//
-//            // changing button/switch image
-//            toggleButtonImage();
-//        }
-//
-//    }
-//
-//    /*
-//    * Turning Off flash
-//    */
-//    private void turnOffFlash() {
-//        if (isFlashOn) {
-//            if (camera == null || params == null) {
-//                return;
-//            }
-//            // play sound
-//            playSound();
-//
-//            params = camera.getParameters();
-//            params.setFlashMode(Parameters.FLASH_MODE_OFF);
-//            camera.setParameters(params);
-//            camera.stopPreview();
-//            isFlashOn = false;
-//
-//            // changing button/switch image
-//            toggleButtonImage();
-//        }
-//    }
-//
-//    /*
-//    * Toggle switch button images
-//    * changing image states to on / off
-//    * */
-//    private void toggleButtonImage(){
-//        if(isFlashOn){
-//            btnSwitch.setImageResource(R.drawable.btn_switch_on);
-//        }else{
-//            btnSwitch.setImageResource(R.drawable.btn_switch_off);
-//        }
-//    }
+    /*
+    * Toggle switch button images
+    * changing image states to on / off
+    * */
+    private void toggleButtonImage(){
+        if(isFlashOn){
+            flashButtonView.setImageResource(R.drawable.ic_flash_on_black_24dp);
+        }else{
+            flashButtonView.setImageResource(R.drawable.ic_flash_off_black_24dp);
+        }
+    }
 }

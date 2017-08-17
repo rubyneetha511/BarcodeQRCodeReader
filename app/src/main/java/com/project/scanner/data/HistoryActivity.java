@@ -42,7 +42,7 @@ public class HistoryActivity extends AppCompatActivity {
         if(listHistory.isEmpty()) {
             Toast.makeText(HistoryActivity.this, "History is empty", Toast.LENGTH_LONG).show();
         }
-        recycler_adapter = new DataAdapter(listHistory, dbhelper, getApplicationContext());
+        recycler_adapter = new DataAdapter(listHistory, dbhelper, this);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(recycler_adapter);

@@ -1,6 +1,8 @@
 package com.project.scanner.data;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.Uri;
 import android.provider.MediaStore;
@@ -59,7 +61,6 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.BarcodeHolder>
         holder.itemView.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
             public boolean onLongClick(View v) {
-                //setPosition(holder.getPosition());
                 return false;
             }
         });
@@ -88,9 +89,6 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.BarcodeHolder>
             barcodeValue = (TextView)itemView.findViewById(R.id.displayValue);
             barcodeDate = (TextView)itemView.findViewById(R.id.date);
 
-            //imageButton = (ImageButton)itemView.findViewById(R.id.button_image);
-            //imageButton.setBackground(R.drawable.new_todo_image);
-
             threeeDotsButton = (ImageButton)itemView.findViewById(R.id.button_three_dots);
             threeeDotsButton.setOnCreateContextMenuListener(this);
             threeeDotsButton.setOnClickListener(new View.OnClickListener() {
@@ -105,43 +103,40 @@ public class DataAdapter extends RecyclerView.Adapter<DataAdapter.BarcodeHolder>
         @Override
         public void onCreateContextMenu(ContextMenu menu, View v,
                                         ContextMenu.ContextMenuInfo menuInfo) {
-            //menuInfo is null
             menu.add(Menu.NONE, R.id.item_delete, Menu.NONE, "Delete").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-                @Override
-                public boolean onMenuItemClick(MenuItem item) {
+                    @Override
+                  public boolean onMenuItemClick(MenuItem item) {
 
-                    dbhelper.deleteHistory(barcodeValue.getText().toString());
-                    Toast.makeText(context, "Successfully deleted", Toast.LENGTH_LONG).show();
+                          AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                          builder.setMessage("Are you sure you want to delete?")
+                                  .setCancelable(false)
+                                  .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                                      public void onClick(DialogInterface dialog, int id) {
 
-                    Intent intent = new Intent(context, HistoryActivity.class);
-                    context.startActivity(intent);
+                                          dbhelper.deleteHistory(barcodeValue.getText().toString());
+                                          Toast.makeText(context, "Successfully deleted", Toast.LENGTH_LONG).show();
 
-                    return true;
-                }
-            });;
-//            menu.add(Menu.NONE, R.id.item_share, Menu.NONE, "Share").setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
-//                @Override
-//                public boolean onMenuItemClick(MenuItem item) {
-//
-//                    Intent sharingIntent = new Intent(Intent.ACTION_SEND);
-//                    sharingIntent.setType("image/jpeg");
-//                    StringBuilder shareBody = new StringBuilder();
-//                    String bitmapPath = MediaStore.Images.Media.insertImage(context.getContentResolver(),
-//                            ScannerUtil.getBitmap(barcodeValue.getText(), barcodeValue.getText(), 100, 100), "title", null);
-//                    Uri bitmapUri = Uri.parse(bitmapPath);
-//
-//                    sharingIntent.putExtra(Intent.EXTRA_STREAM, bitmapUri);
-//                    shareBody.append(barcodeData.getDisplayValue());
-//
-//                    sharingIntent.putExtra(android.content.Intent.EXTRA_SUBJECT, "Barcode/QR Code");
-//                    sharingIntent.putExtra(android.content.Intent.EXTRA_TEXT, shareBody.toString());
-//
-//                    context.startActivity(Intent.createChooser(sharingIntent, "Share via"));
-//
-//                    return true;
-//                }
-//            });
+                                          Intent intent = new Intent(context, HistoryActivity.class);
+                                          context.startActivity(intent);
+
+                                          dialog.dismiss();
+
+                                      }
+                                  })
+                                  .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                      public void onClick(DialogInterface dialog, int id) {
+                                          dialog.cancel();
+                                      }
+                                  });
+
+                        builder.show();
+                        return true;
+                    }
+              });
+
         }
 
     }
+
+
 }
